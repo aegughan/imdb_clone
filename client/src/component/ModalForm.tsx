@@ -1,7 +1,28 @@
 import React from "react";
 import Input from "./Input";
 
-export default function ModalForm(props) {
+interface ModalDataInterface {
+  name: string;
+  gender: string;
+  dob: string;
+  bio: string;
+}
+
+interface Dropdown {
+  id: number;
+  name: string;
+}
+
+interface ModalFormInterface {
+  isAddActor: boolean;
+  onModalChangeHandler: () => void;
+  modalObj: ModalDataInterface;
+  modalObjError: ModalDataInterface;
+  saveModalData: () => void;
+  onCloseModal: () => void;
+  genderList: Dropdown[];
+}
+export default function ModalForm(props: ModalFormInterface) {
   const {
     isAddActor,
     onModalChangeHandler,
