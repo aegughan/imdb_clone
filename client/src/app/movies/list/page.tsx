@@ -3,6 +3,23 @@ import { getApi } from "@/services";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+interface Actor {
+  name: string;
+}
+
+interface ActorMovie {
+  actors: Actor;
+}
+
+interface Movie {
+  id: number;
+  name: string;
+  year_of_release: string;
+  plot: string;
+  poster: string;
+  actor_movies: ActorMovie[];
+  producers: Actor;
+}
 export default function List() {
   const [moviesList, setMoviesList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,7 +47,7 @@ export default function List() {
         "Loading...."
       ) : (
         <>
-          {moviesList?.map((movieObj, index) => {
+          {moviesList?.map((movieObj: Movie, index: number) => {
             return (
               <div className="card" key={`movie_${index + 1}`}>
                 <div>
