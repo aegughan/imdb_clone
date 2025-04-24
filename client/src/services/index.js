@@ -1,5 +1,5 @@
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export const getApi = async (path) => {
-  const baseUrl = "http://localhost:8080";
   return await fetch(`${baseUrl}${path}`).then((res) => {
     if (!res.ok) throw res.response.data;
     return res.json();
@@ -7,7 +7,6 @@ export const getApi = async (path) => {
 };
 
 export const postApi = async (path, data, method = "POST") => {
-  const baseUrl = "http://localhost:8080";
   return await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
