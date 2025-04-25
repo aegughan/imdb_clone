@@ -20,5 +20,5 @@ const actorsRoutes = require("./routes/actors");
 app.use("/api/actors", actorsRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server started on the port ${PORT}`);
+    console.log(`Server started on the port ${PORT}`);
 });

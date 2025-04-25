@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation"
 
 const Page = () => {
-  useEffect(() => {
-    fetch("http://localhost:8080/api/home")
-      .then((res) => res.json())
-      .then(() => {});
-  }, []);
-  return <div>page</div>;
+    const router = useRouter()
+    useEffect(() => {
+        router.push("/movies/list")
+    }, []);
+    return <div>Home page</div>;
 };
 
 export default Page;

@@ -1,5 +1,7 @@
 const nextConfig = {
-  reactStrictMode: true,
+  images: {
+    domains: ['enqxddkaimpegigijwnv.supabase.co'],
+  },
 };
 
 export default nextConfig;
