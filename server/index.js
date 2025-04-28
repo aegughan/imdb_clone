@@ -19,6 +19,9 @@ app.use("/api/gender", genderRoutes);
 const actorsRoutes = require("./routes/actors");
 app.use("/api/actors", actorsRoutes);
 
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server started on the port ${PORT}`);
 });

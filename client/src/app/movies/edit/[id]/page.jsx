@@ -34,7 +34,8 @@ export default function Edit() {
     }
     return (
         <div>
-            <div>Edit Movie</div>
+            <div className="mx-6"><b>Edit Movie</b></div>
+            <br />
             <MovieForm movieData={movieData} isEdit />
         </div>
     );

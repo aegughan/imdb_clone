@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const supabase = require("../supabaseClient");
 const Joi = require("joi");
+const authenticateJWT = require("../middlewares/auth");
 const table_name = "producers";
 
 const producerSchema = Joi.object({
@@ -12,7 +13,7 @@ const producerSchema = Joi.object({
 });
 
 // Get all producer
-router.get("/", async (_, res) => {
+router.get("/", authenticateJWT, async (_, res) => {
     const { data, error } = await supabase.from(table_name).select(`
         id,
         name
@@ -22,7 +23,7 @@ router.get("/", async (_, res) => {
 });
 
 // Create producer
-router.post("/", async (req, res) => {
+router.post("/", authenticateJWT, async (req, res) => {
     const { error, value } = producerSchema.validate(req.body);
     if (error) {
         return res.status(500).json({ error: error.details[0].message });

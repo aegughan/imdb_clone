@@ -3,6 +3,7 @@ const router = express.Router();
 const supabase = require("../supabaseClient");
 const Joi = require("joi");
 const multer = require("multer");
+const authenticateJWT = require("../middlewares/auth");
 const table_name = "movies";
 const upload = multer();
 
@@ -30,7 +31,7 @@ const columnToSelect = `id,
             id, name
         )`;
 // Get all movies
-router.get("/", async (_, res) => {
+router.get("/", authenticateJWT, async (_, res) => {
     const { data, error } = await supabase
         .from(table_name)
         .select(columnToSelect).order('created_at', { ascending: false });
@@ -39,7 +40,7 @@ router.get("/", async (_, res) => {
 });
 
 // Create movie
-router.post("/", upload.single('poster'), async (req, res) => {
+router.post("/", authenticateJWT, upload.single('poster'), async (req, res) => {
     const { name, year_of_release, plot, producer_id, actors_list } = req.body
     const reuqestData = { name, year_of_release, plot, producer_id, actors_list: actors_list?.split(",") }
     const { error, value } = movieSchema.validate(reuqestData);
@@ -80,7 +81,7 @@ router.post("/", upload.single('poster'), async (req, res) => {
 });
 
 // Update movie
-router.put("/:id", upload.single('poster'), async (req, res) => {
+router.put("/:id", authenticateJWT, upload.single('poster'), async (req, res) => {
     const { id } = req.params;
     const { name, year_of_release, plot, producer_id, actors_list } = req.body
     const reuqestData = { name, year_of_release, plot, producer_id, actors_list: actors_list?.split(",") }
@@ -148,7 +149,7 @@ router.put("/:id", upload.single('poster'), async (req, res) => {
 });
 
 // get movie by id
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
     const { data, error } = await supabase
         .from(table_name)

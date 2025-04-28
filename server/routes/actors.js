@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const supabase = require("../supabaseClient");
 const Joi = require("joi");
+const authenticateJWT = require("../middlewares/auth");
 const table_name = "actors";
 
 const actorSchema = Joi.object({
@@ -12,7 +13,7 @@ const actorSchema = Joi.object({
 });
 
 // Get all actor
-router.get("/", async (_, res) => {
+router.get("/", authenticateJWT, async (_, res) => {
     const { data, error } = await supabase.from(table_name).select(`
         id,
         name
@@ -22,7 +23,7 @@ router.get("/", async (_, res) => {
 });
 
 // Create actor
-router.post("/", async (req, res) => {
+router.post("/", authenticateJWT, async (req, res) => {
     const { error, value } = actorSchema.validate(req.body);
     if (error) {
         return res.status(500).json({ error: error.details[0].message });
@@ -32,5 +33,27 @@ router.post("/", async (req, res) => {
         res.json(data);
     }
 });
+
+
+// get actor by id
+router.get("/:id", authenticateJWT, async (req, res) => {
+    const { id } = req.params;
+    const { data, error } = await supabase
+        .from(table_name)
+        .select("*, gender(id, name)")
+        .eq("id", id)
+        .single();
+
+    if (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+    if (!data) {
+        return res.status(404).json({ message: "Actor not found" });
+    }
+
+    res.json(data);
+});
+
 
 module.exports = router;

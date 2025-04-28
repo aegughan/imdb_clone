@@ -5,8 +5,10 @@ import Input from "./Input";
 import ModalForm from "./ModalForm";
 import Link from "next/link";
 import { getApi, postApi } from "../services";
+import { useRouter } from "next/navigation";
 
 export default function MovieForm(props) {
+    const router = useRouter()
     const { movieData, isEdit = false } = props;
     const initialFormData = {
         name: "",
@@ -30,11 +32,11 @@ export default function MovieForm(props) {
     const [actorsList, setActorsList] = useState([]);
     const [genderList, setGenderList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [btnLoading, setBtnLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [isAddActor, setIsAddActor] = useState(false);
     const [isModalDataCreated, setIsModalDataCreated] = useState(false);
     const [isErrorWhileCreating, setIsErrorWhileCreating] = useState(false);
-    const [isMovieCreated, setIsMovieCreated] = useState(false);
     const [isMovieCreationFailed, setIsMovieCreationFailed] = useState(false);
 
     const getProducerList = async () => {
@@ -109,7 +111,7 @@ export default function MovieForm(props) {
             return;
         }
         setModalObjError({});
-        await postApi(`/api/${isAddActor ? "actors" : "producers"}`, modalObj)
+        await postApi(`/api/${isAddActor ? "actors" : "producers"}`, modalObj, true)
             .then(() => {
                 setIsModalDataCreated(true);
             })
@@ -200,24 +202,27 @@ export default function MovieForm(props) {
         formData.append("producer_id", producer)
         formData.append("actors_list", actorsList)
 
+        setBtnLoading(true)
         if (isEdit) {
-            await postApi(`/api/movies/${movieData.id}`, formData, "PUT", true)
+            await postApi(`/api/movies/${movieData.id}`, formData, true, "PUT", true)
                 .then(() => {
-                    setIsMovieCreated(true);
+                    router.push("/movies/list")
                     setIsMovieCreationFailed(false);
                 })
                 .catch(() => {
                     setIsMovieCreationFailed(true);
-                });
+                })
+                .finally(() => setBtnLoading(false));
         } else {
-            await postApi(`/api/movies`, formData, "POST", true)
+            await postApi(`/api/movies`, formData, true, "POST", true)
                 .then(() => {
-                    setIsMovieCreated(true);
+                    router.push("/movies/list")
                     setIsMovieCreationFailed(false);
                 })
                 .catch(() => {
                     setIsMovieCreationFailed(true);
-                });
+                })
+                .finally(() => setBtnLoading(false));
         }
     };
 
@@ -241,22 +246,11 @@ export default function MovieForm(props) {
         }
     };
     if (loading) {
-        return <div>Loading...</div>;
-    }
-    if (isMovieCreated) {
-        return (
-            <div>
-                <div>Movie {isEdit ? "updated" : "created"} successfully</div>
-                <Link href="/movies/list">
-                    <button className="button">Go to list</button>
-                </Link>
-            </div>
-        );
+        return <div className="mx-6">Loading...</div>;
     }
     return (
-        <div>
-            <br />
-            <div className="flexRow gap_20">
+        <div className="card mx-6">
+            <div className="flexRow gap_20 mb-2">
                 <Input
                     label={"Name"}
                     type="text"
@@ -266,8 +260,7 @@ export default function MovieForm(props) {
                 />
             </div>
             {formObjError?.name && <div className="error">{formObjError?.name}</div>}
-            <br />
-            <div className="flexRow gap_20">
+            <div className="flexRow gap_20 mb-2">
                 <Input
                     label={"Year of Release"}
                     type="date"
@@ -279,8 +272,7 @@ export default function MovieForm(props) {
             {formObjError?.yearOfRelease && (
                 <div className="error">{formObjError?.yearOfRelease}</div>
             )}
-            <br />
-            <div className="flexRow gap_20">
+            <div className="flexRow gap_20 mb-2">
                 <label>Plot:</label>
                 <textarea
                     id="plot"
@@ -290,23 +282,22 @@ export default function MovieForm(props) {
                 />
             </div>
             {formObjError?.plot && <div className="error">{formObjError?.plot}</div>}
-            <br />
-            <div className="flexRow gap_20">
+
+            <div className="flexRow gap_20 mb-2">
                 <Input
                     label={"Poster"}
                     type="file"
                     id="poster"
                     onChange={onChangeHandler}
                     value={formObj?.poster}
+                    fileName={formObj?.poster === '' && formObj?.posterFile ? formObj?.posterFile?.split("/")[formObj?.posterFile?.split("/").length - 1] : ""}
                 />
             </div>
-            {formObj?.poster === '' && formObj?.posterFile &&
-                <div><br />Previous File: {formObj?.posterFile?.split("/")[formObj?.posterFile?.split("/").length - 1]}</div>}
             {formObjError?.poster && (
                 <div className="error">{formObjError?.poster}</div>
             )}
-            <br />
-            <div className="flexRow gap_20">
+
+            <div className="flexRow gap_20 mb-2">
                 <label>Select Producer:</label>
                 <select
                     id="producer"
@@ -337,8 +328,8 @@ export default function MovieForm(props) {
             {formObjError?.producer && (
                 <div className="error">{formObjError?.producer}</div>
             )}
-            <br />
-            <div className="flexRow gap_20">
+
+            <div className="flexRow gap_20 mb-2">
                 <label>Select Actors:</label>
                 <select
                     id="producer"
@@ -370,9 +361,16 @@ export default function MovieForm(props) {
                 <div className="error">{formObjError?.actorsList}</div>
             )}
             <br />
-            <div className="flexRow gap_20">
-                <button className="button" onClick={createMovie}>
-                    {isEdit ? "Update" : "Create"}
+            <div className="flexRow gap_20 mb-2">
+                <button className="button" disabled={btnLoading} onClick={createMovie}>
+                    {btnLoading ? (
+                        <div className="spinner-border spinner-border-sm" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    ) :
+                        <>{isEdit ? "Update" : "Create"}</>}
+
+
                 </button>
                 <button className="secondaryBtn" onClick={resetMovieData}>
                     Reset
@@ -381,7 +379,6 @@ export default function MovieForm(props) {
                     <button className="button">Go to list</button>
                 </Link>
             </div>
-            <br />
             {isMovieCreationFailed && (
                 <div className="error">
                     Movie {isEdit ? "updation" : "creation"} failed

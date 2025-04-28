@@ -8,7 +8,7 @@ const Modal = ({ isOpen, onClose, children }) => {
         <div className="modal-overlay">
             <div className="modal-content">
                 <button className="modal-close" onClick={onClose}>
-                    ✖
+                    X
                 </button>
                 {children}
             </div>
