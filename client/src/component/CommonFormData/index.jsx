@@ -3,8 +3,7 @@ import React from 'react';
 import Link from "next/link";
 
 export default function CommonFormData(props) {
-    const { data, isActor } = props;
-    const [open, setOpen] = useState(false);
+    const { data } = props;
 
     return (
         <div>
