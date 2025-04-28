@@ -76,9 +76,9 @@ export default function Login() {
                                 </button>
                             </form>
                         </div>
-                <div className="alignRight">
-                    Don't have an account? <Link href="/signup">Sign Up</Link> here
-                </div>
+                        <div className="alignRight mx-3">
+                            Don't have an account? <Link href="/signup">Sign Up</Link> here
+                        </div>
                     </div>
                 </div>
             </div>

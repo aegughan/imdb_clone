@@ -7,7 +7,7 @@ const table_name = "producers";
 
 const producerSchema = Joi.object({
     name: Joi.string().min(1).required(),
-    gender: Joi.number().integer().min(1).max(3),
+    gender: Joi.number().integer().min(1).max(3).required(),
     dob: Joi.date().less("now").iso().required(),
     bio: Joi.string().min(1).required(),
 });
@@ -32,6 +32,26 @@ router.post("/", authenticateJWT, async (req, res) => {
         if (error) return res.status(500).json({ error: error.message });
         res.json(data);
     }
+});
+
+// get producer by id
+router.get("/:id", authenticateJWT, async (req, res) => {
+    const { id } = req.params;
+    const { data, error } = await supabase
+        .from(table_name)
+        .select("*, gender(id, name)")
+        .eq("id", id)
+        .single();
+
+    if (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+    if (!data) {
+        return res.status(404).json({ message: "Actor not found" });
+    }
+
+    res.json(data);
 });
 
 module.exports = router;

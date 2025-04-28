@@ -7,7 +7,7 @@ const table_name = "actors";
 
 const actorSchema = Joi.object({
     name: Joi.string().min(1).required(),
-    gender: Joi.number().integer().min(1).max(3),
+    gender: Joi.number().integer().min(1).max(3).required(),
     dob: Joi.date().less("now").iso().required(),
     bio: Joi.string().min(1).required(),
 });

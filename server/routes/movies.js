@@ -11,9 +11,9 @@ const movieSchema = Joi.object({
     name: Joi.string().min(1).required(),
     year_of_release: Joi.date().iso().required(),
     plot: Joi.string().min(1).required(),
-    producer_id: Joi.number().integer().min(1).max(3),
+    producer_id: Joi.number().integer().required(),
     actors_list: Joi.array()
-        .items(Joi.number().integer().min(1).required())
+        .items(Joi.number().integer().required())
         .required(),
 });
 

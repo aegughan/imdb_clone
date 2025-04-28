@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Modal from "./Modal";
 import Input from "./Input";
 import ModalForm from "./ModalForm";
 import Link from "next/link";
@@ -20,23 +19,13 @@ export default function MovieForm(props) {
     };
     const [formObj, setFormObj] = useState(initialFormData);
     const [formObjError, setFormObjError] = useState({});
-    const intialModalData = {
-        name: "",
-        gender: "",
-        dob: "",
-        bio: "",
-    };
-    const [modalObj, setModalObj] = useState(intialModalData);
-    const [modalObjError, setModalObjError] = useState(intialModalData);
+   
     const [producerList, setProducerList] = useState([]);
     const [actorsList, setActorsList] = useState([]);
-    const [genderList, setGenderList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [btnLoading, setBtnLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [isAddActor, setIsAddActor] = useState(false);
-    const [isModalDataCreated, setIsModalDataCreated] = useState(false);
-    const [isErrorWhileCreating, setIsErrorWhileCreating] = useState(false);
     const [isMovieCreationFailed, setIsMovieCreationFailed] = useState(false);
 
     const getProducerList = async () => {
@@ -47,11 +36,6 @@ export default function MovieForm(props) {
     const getActorsList = async () => {
         const actorsData = await getApi("/api/actors");
         setActorsList(actorsData);
-        return true;
-    };
-    const getGenderList = async () => {
-        const genderData = await getApi("/api/gender");
-        setGenderList(genderData);
         return true;
     };
 
@@ -73,7 +57,6 @@ export default function MovieForm(props) {
         }
     }, [movieData, isEdit]);
     const getDropdownData = async (callType) => {
-        setLoading(true);
         const dropdownGetList = [];
         if (callType.includes("producers")) {
             dropdownGetList.push(getProducerList());
@@ -81,45 +64,14 @@ export default function MovieForm(props) {
         if (callType.includes("actors")) {
             dropdownGetList.push(getActorsList());
         }
-        if (callType.includes("gender")) {
-            dropdownGetList.push(getGenderList());
-        }
         await Promise.all(dropdownGetList).then(() => setLoading(false));
     };
     useEffect(() => {
-        getDropdownData(["producers", "actors", "gender"]);
+        setLoading(true);
+        getDropdownData(["producers", "actors"]);
     }, []);
 
-    const saveModalData = async (event) => {
-        event.preventDefault();
-        const isErrorObj = {};
-        const { name, gender, dob, bio } = modalObj;
-        if (name == "") {
-            isErrorObj.name = "Name cannot be empty";
-        }
-        if (gender == "") {
-            isErrorObj.gender = "Gender cannot be empty";
-        }
-        if (dob == "") {
-            isErrorObj.dob = "DOB cannot be empty";
-        }
-        if (bio == "") {
-            isErrorObj.bio = "Bio cannot be empty";
-        }
-        if (Object.entries(isErrorObj).length > 0) {
-            setModalObjError({ ...isErrorObj });
-            return;
-        }
-        setModalObjError({});
-        await postApi(`/api/${isAddActor ? "actors" : "producers"}`, modalObj, true)
-            .then(() => {
-                setIsModalDataCreated(true);
-            })
-            .catch(() => {
-                setIsErrorWhileCreating(true);
-            });
-        getDropdownData([isAddActor ? "actors" : "producers"]);
-    };
+   
     const onChangeHandler = (event) => {
         const id = event.target.id;
         if (id === "poster") {
@@ -146,24 +98,6 @@ export default function MovieForm(props) {
             ...formObj,
             actorsList: selected,
         });
-    };
-
-    const onModalChangeHandler = (event) => {
-        const value = event.target.value;
-        const id = event.target.id;
-        setModalObj({
-            ...modalObj,
-            [id]: value,
-        });
-    };
-
-    const onCloseModal = (event) => {
-        event.preventDefault();
-        setOpen(false);
-        setModalObj(intialModalData);
-        setModalObjError(intialModalData);
-        setIsModalDataCreated(false);
-        setIsErrorWhileCreating(false);
     };
 
     const createMovie = async () => {
@@ -384,23 +318,7 @@ export default function MovieForm(props) {
                     Movie {isEdit ? "updation" : "creation"} failed
                 </div>
             )}
-            <Modal isOpen={open} onClose={onCloseModal}>
-                {isErrorWhileCreating ? (
-                    <>{`Error while creating ${isAddActor ? "actor" : "producer"} `}</>
-                ) : isModalDataCreated ? (
-                    <>{`${isAddActor ? "Actor" : "Producer"} created successfully :)`}</>
-                ) : (
-                    <ModalForm
-                        isAddActor={isAddActor}
-                        onModalChangeHandler={onModalChangeHandler}
-                        modalObj={modalObj}
-                        modalObjError={modalObjError}
-                        saveModalData={saveModalData}
-                        genderList={genderList}
-                        onCloseModal={onCloseModal}
-                    />
-                )}
-            </Modal>
+            <ModalForm isAddActor={isAddActor} setOpen={setOpen} open={open} callBack={getDropdownData}/>
         </div>
     );
 }

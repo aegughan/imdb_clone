@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { postApi } from '../../services';
 import { useRouter } from "next/navigation"
 import Toast from '../../component/Toast';
+import Link from 'next/link';
 
 
 export default function Signup() {
@@ -99,6 +100,9 @@ export default function Signup() {
                                         Sign Up
                                     </button>
                                 </form>
+                            </div>
+                            <div className="alignRight mx-3">
+                                Already have an account? <Link href="/login">Login</Link> here
                             </div>
                         </div>
                     </div>

@@ -7,14 +7,14 @@ import CommonFormData from "../../../component/CommonFormData";
 export default function Actor() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
-    const [actorData, setActorData] = useState({});
+    const [producerData, setProducerData] = useState({});
     const [isErrorOccured, setIsErrorOccured] = useState({});
     useEffect(() => {
-        const getActorData = async () => {
+        const getProducerData = async () => {
             setLoading(true);
-            await getApi(`/api/actors/${id}`)
+            await getApi(`/api/producers/${id}`)
                 .then((data) => {
-                    setActorData(data);
+                    setProducerData(data);
                     setIsErrorOccured(false);
                 })
                 .catch(() => setIsErrorOccured(true))
@@ -22,7 +22,7 @@ export default function Actor() {
                     setLoading(false);
                 });
         };
-        getActorData();
+        getProducerData();
     }, [id]);
 
     if (loading) {
@@ -32,6 +32,6 @@ export default function Actor() {
         return <>Error occurred wile fetching the data for actor id: {id}</>;
     }
     return (
-        <CommonFormData data={actorData} isActor={true}/>
+        <CommonFormData data={producerData} isActor={false} />
     );
 }
